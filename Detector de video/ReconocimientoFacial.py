@@ -7,7 +7,7 @@ print("imagePaths", imagePaths)
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 
 #Leyendo el modelo
-face_recognizer.read('modeloEigenFace.xml')
+face_recognizer.read('modeloLBPHFace.xml')
 
 cap = cv2.VideoCapture(0)
 
@@ -23,7 +23,23 @@ while True:
     
     for (x,y,w,h) in faces:
         rostro = auxFrame[y:y+h,x:x+w]
-        rostro = cv2.resized(rostro, interpolation=cv.INTER_NEAREST)
+        rostro = cv2.resize(rostro, (150, 150),interpolation = cv2.INTER_NEAREST)
         result = face_recognizer.predict(rostro)
+        cv2.putText(frame, f'{result}', (x,y+5), 1, 1.3, (255, 255,0), 1, cv2.LINE_AA)
         
-        cv2.putText(frame)
+        #LBPHFaceRecognizer_create 
+        
+        if result[1] < 70:
+            cv2.putText(frame, '{}'.format(imagePaths[result[0]]), (x, y -25), 2,1.1,(0,255,0),1,cv2.LINE_AA)
+            cv2.rectangle(frame, (x,y),(x+w,y+h),(0,0,255), 2)
+        else:
+            cv2.putText(frame, 'Desconocido', (x, y -20), 2,1.1,(0,255,0),1,cv2.LINE_AA)
+            cv2.rectangle(frame, (x,y),(x+w,y+h),(0,0,255), 2)
+            
+    cv2.imshow('frame', frame)
+    k = cv2.waitKey(1)
+    if k == 27:
+        break
+
+cap.release()
+cv2.destroyAllWindows()
